@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <!--boostrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <title>Gestion de viajes</title>
+    <!--dataTables-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.boostrap5.min.css">
+
+    <!--boostrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <!--jquery-->
+    <script	src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>  
+    <!--dataTables-->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>  
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.boostrap5.min.js"></script>
+    
+    <script src='index.js'></script>
+   
+   
+<script type="text/javascript">  
+
+//datatable mostrar todos los viajes
+let dataTable;
+let dataTableIsInitialized = false;
+
+const dataTableOptions={
+    pageLength: 8,
+    destroy:true
+}
+
+const initDataTable = async () => {
+    if (dataTableIsInitialized) {
+        dataTable.destroy();
+    }
+    await listaViajes();
+    dataTable=$(`#datatable_viajes`).DataTable({dataTableOptions});
+    dataTableIsInitialized=true;
+}
+
+const listaViajes= async () =>{
+    try{
+        const respuesta= await fetch("http://localhost:3000/api/getviajes");
+        const datos=respuesta.json();
+        
+        let contenido = ``;
+        datos.forEach((dato,posicion)=>{
+            contenido+=`
+            <tr>
+                <td>${dato.id}</td>
+                <td>${dato.nombreChofer}</td>
+                <td>${dato.apellidoChofer}</td>
+                <td>${dato.dniChofer}</td>
+                <td>${dato.patente}</td>
+                <td>${dato.cuitCliente}</td>
+                <td>${dato.origen}</td>
+                <td>${dato.destino}</td>
+            </tr>`
+        });
+        tableBody_viajes.innerHTML = contenido;
+    }catch(ex){
+        alert(ex);
+    }
+};
+
+
+$(document).ready(function(){
+    $("#todoslosviajes").click(function(){
+        $("#tablaviajes").show();
+        $("#abmviajes").hide();
+        window.addEventListener("load",async()=> {
+            await initDataTable();
+        });
+      
+    });
+  });
+  
+  $(document).ready(function(){
+    $("#actualizar").click(function(){
+        alert("actualizando")
+        window.addEventListener("load",async()=> {
+            await initDataTable();
+        });
+      
+    });
+  });
+
+$(document).ready(function(){
+    $("#s4").click(function(){
+        $("#abmviajes").show();
+        $("#tablaviajes").hide();
+    });
+});
+
+
+
+$(document).ready(function(){
+    $("#borrav").click(function(){
+        const id = ("#idm").val
+        const data = async ()=> {
+            try {
+                const respuesta = await fetch(('http://localhost:3000/api/deleteviajes/' + id), {
+                    method: 'DELETE',
+                    headers:{'Content-Type': 'application/json'}
+                })
+            }
+        }
+        alert("eliminado")
+    });
+});
+
+//presentacion
+
+$(document).ready(function(){
+    $("#gestionviajes").click(function(){
+        $("#abmviajes").show();
+        $("#presentacion").hide();
+    });
+});
+
+$(document).ready(function(){
+    $("#nuevocliente").click(function(){
+        $("#altacliente").show();
+        $("#presentacion").hide();
+    });
+});
+
+// alta cliente
+
+$(document).ready(function(){
+    $("#altac").click(function(){
+        
+        const formulario = document.querySelector("#altacliente");
+
+        const getData = () => {
+            const datos = new FormData(formulario);
+            const datosProcesados = Object.fromEntries(datos.entries());
+            formulario.reset();
+            return datosProcesados
+        }
+
+        const data = async ()=> {
+            const nuevoCliente = getData();
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/clientes', {
+                    method: 'POST',
+                    headers:{'Content-Type': 'application/json'},
+                    body:JSON.stringify(nuevoCliente)
+                })
+            }
+        }
+        alert("success")
+    });
+});
+
+$(document).ready(function(){
+    $("#s2").click(function(){
+        $("#presentacion").show();
+        $("#altacliente").hide();
+    });
+});
+
+// gestion de viajes
+
+$(document).ready(function(){
+    $("#todoslosviajes").click(function(){
+        $("#tablaviajes").show();
+        $("#abmviajes").hide();
+    });
+});
+
+$(document).ready(function(){
+    $("#s3").click(function(){
+        $("#presentacion").show();
+        $("#abmviajes").hide();
+    });
+});
+
+$(document).ready(function(){
+    $("#altav").click(function(){
+
+        const formulario = document.querySelector("#abmviajes");
+
+        const getData = () => {
+            const datos = new FormData(formulario);
+            const datosProcesados = Object.fromEntries(datos.entries());
+            formulario.reset();
+            return datosProcesados
+        }
+
+        const data = async ()=> {
+            const nuevoCliente = getData();
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/postviajes', {
+                    method: 'POST',
+                    headers:{'Content-Type': 'application/json'},
+                    body:JSON.stringify(nuevoCliente)
+                })
+            }
+        }
+        alert("dado de alta")
+    });
+});
+
+$(document).ready(function(){
+    $("#modificav").click(function(){
+        const id= ("#idv").val()
+        const formulario = document.querySelector("#abmviajes");
+
+        const getData = () => {
+            const datos = new FormData(formulario);
+            const datosProcesados = Object.fromEntries(datos.entries());
+            formulario.reset();
+            return datosProcesados
+        }
+
+        const data = async ()=> {
+            const nuevoCliente = getData();
+            try {
+                const respuesta = await fetch(('http://localhost:3000/api/putviajes/' + idv), {
+                    method: 'PUT',
+                    headers:{'Content-Type': 'application/json'},
+                    body:JSON.stringify(nuevoCliente)
+                })
+            }
+        }
+        alert("modificado")
+    });
+});
+
+</script>
+
+</head>
+<body>
+    <div class="container my-4 text-center">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <form class="cont2" id="presentacion">
+                <h1>Sistema de Gestión de Viajes</h1>
+                <br><br>
+                <h3>Puede gestionar los viajes de los choferes</h3>
+                <h3>y dar de alta nuevos Clientes</h3>
+            <br><br><br>
+            <div id="bts">
+                <button type="button" class="btn btn-primary btn-lg" id="gestionviajes">Gestionar Viajes</button>
+                <button type="button" class="btn btn-primary btn-lg" id="nuevocliente">Nuevo cliente</button>
+            </div>
+            </form>
+        </div>
+    </div>
+    <div class="container my-4 text-center">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <form class="cont2" id="altacliente" style="display:none" >
+                <div>
+                    <label>Nombre: <input name="nombre" type="text" class="form-control" id="nombre" placeholder=""></label>
+                </div>
+                <div>
+                    <label>CUIT: <input name="cuit" type="number" class="form-control" id="cuit" placeholder=""></label>
+                    <br>
+                </div>
+                <br><br>
+                <div id="bts2" >
+                    <button type="button" class="btn btn-primary btn-lg" id="altac">Dar de Alta</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="s2">Salir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <form class="cont2" id="abmviajes" style="display:none">
+                <h3 class="text-center">Altas, bajas y modificaciones de Viajes</h3>
+                <br>
+                <div>
+                    <label>id: <input name="id" type="number" class="form-control text-center" id="idv" placeholder=""></label>
+                </div>
+                <div>
+                <br>
+                <p> Datos del Chofer:</p>
+                </div>
+                <div>
+                    <label>Nombre: <input name="nombreChofer" type="text" class="form-control" id="nombre" placeholder=""></label>
+                </div>
+                <div>
+                    <label>Apellido: <input name="apellidoChofer" type="text" class="form-control" id="apellido" placeholder=""></label>
+                </div>
+                <div>
+                    <label>DNI: <input name="dniChofer" type="number" class="form-control" id="dni" placeholder=""></label>
+                </div>
+                <br>
+                <div>
+                    <label>Patente: <input name="patente" type="text" class="form-control" id="patente" placeholder=""></label>
+                </div>
+                <div>
+                    <label>CUIT del Cliente: <input name="cuitCliente" type="number" class="form-control" id="cuitcliente" placeholder=""></label>
+                </div>
+                <div>
+                    <label>Origen: <input name="origen" type="text" class="form-control" id="origen" placeholder=""></label>
+                </div>
+                <div>
+                    <label>Destino: <input name="destino" type="text" class="form-control" id="destino" placeholder=""></label>
+                </div>
+                <br><br>
+                <div id="bts2" class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="altav">Agregar</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="modificav">Modificar</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="todoslosviajes">Ver todos los Viajes</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="s3">Salir</button>
+                </div>
+                <br><br>
+            </form>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <form class="cont2" id="tablaviajes" style="display:none" >
+                <table id="datatable_viajes" class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre Chofer</th>
+                            <th>Apellido Chofer</th>
+                            <th>DNI Chofer</th>
+                            <th>Patente</th>
+                            <th>Cuit Cliente</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablebody_viajes"></tbody>
+                </table>
+                <br><br><br>
+                <div id="bts5" class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg" id="actualizar">Actualizar</button>
+                    <button type="button" class="btn btn-primary btn-lg" id="s4">Atrás</button>
+                </div>
+                <br><br>
+                <div class="text-center">
+                    <label>id de viaje a eliminar: <input name="id" type="number" class="form-control" id="idm" placeholder=""></label>
+                </div>
+                <br><br>
+                <div id="bts2" class="text-center">
+                    
+                    <button type="button" class="btn btn-primary btn-lg" id="borrav">Eliminar</button>
+                </div>
+                <br><br>
+            </form>
+        </div>  
+    </div>
+</body>
+</html>   
